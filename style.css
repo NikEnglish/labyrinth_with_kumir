@@ -120,6 +120,7 @@ h1 {
     background: linear-gradient(45deg, #4CAF50 0%, #45a049 100%);
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
     animation: playerPulse 1.5s infinite;
+    transition: all 0.3s ease-in-out;
 }
 
 @keyframes playerPulse {
@@ -155,6 +156,7 @@ h1 {
     gap: 8px;
     max-width: 200px;
     animation: fadeIn 0.8s ease-out;
+    position: relative;
 }
 
 .control-btn {
@@ -166,33 +168,39 @@ h1 {
     color: white;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .control-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #444 0%, #555 100%);
 }
 
 .control-btn:active {
     transform: scale(0.95) translateY(0);
 }
 
-.control-btn:nth-child(1) {
+.control-btn.up {
     grid-column: 2;
+    grid-row: 1;
 }
 
-.settings-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.control-btn.left {
+    grid-column: 1;
+    grid-row: 2;
 }
 
-.settings-btn:hover {
-    background: #f0f0f0;
-    transform: rotate(90deg);
+.control-btn.down {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.control-btn.right {
+    grid-column: 3;
+    grid-row: 2;
 }
 
 .modal {
