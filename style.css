@@ -120,6 +120,7 @@ h1 {
     background: linear-gradient(45deg, #4CAF50 0%, #45a049 100%);
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
     animation: playerPulse 1.5s infinite;
+    transition: transform 0.3s ease;
 }
 
 @keyframes playerPulse {
@@ -154,7 +155,6 @@ h1 {
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     max-width: 200px;
-    animation: fadeIn 0.8s ease-out;
 }
 
 .control-btn {
@@ -174,7 +174,7 @@ h1 {
 }
 
 .control-btn:active {
-    transform: scale(0.95) translateY(0);
+    transform: scale(0.95);
 }
 
 .control-btn:nth-child(1) {
@@ -183,16 +183,17 @@ h1 {
 
 .settings-btn {
     padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
+    border: none;
     border-radius: 4px;
     background: white;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 1.2rem;
 }
 
 .settings-btn:hover {
-    background: #f0f0f0;
     transform: rotate(90deg);
+    background: #f0f0f0;
 }
 
 .modal {
@@ -204,7 +205,6 @@ h1 {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
-    transition: all 0.3s ease;
 }
 
 .modal-content {
@@ -216,7 +216,6 @@ h1 {
     padding: 2rem;
     border-radius: 8px;
     min-width: 300px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     animation: modalOpen 0.3s ease-out;
 }
 
@@ -233,7 +232,6 @@ h1 {
 
 .setting-item {
     margin: 1rem 0;
-    transition: all 0.3s ease;
 }
 
 .close-btn {
@@ -263,7 +261,6 @@ h1 {
     border-radius: 4px;
     display: none;
     animation: toastSlideUp 0.3s ease-out;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes toastSlideUp {
