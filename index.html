@@ -1,49 +1,49 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Звуковой лабиринт</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Звуковой лабиринт</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Звуковой лабиринт</h1>
-            <div class="stats">
-                <p>Уровень: <span id="level">1</span></p>
-                <p>Счет: <span id="score">0</span></p>
-                <p>Рекорд: <span id="highscore">0</span></p>
-            </div>
-            <button id="settings-btn" class="settings-btn">⚙️</button>
-        </div>
-
-        <div id="maze" class="maze"></div>
-
-        <div class="controls">
-            <button onclick="movePlayer(0, -1)" class="control-btn">⬆️</button>
-            <button onclick="movePlayer(-1, 0)" class="control-btn">⬅️</button>
-            <button onclick="movePlayer(0, 1)" class="control-btn">⬇️</button>
-            <button onclick="movePlayer(1, 0)" class="control-btn">➡️</button>
-        </div>
-    </div>
-
-    <div id="settings-modal" class="modal">
-        <div class="modal-content">
-            <h2>Настройки</h2>
-            <div class="setting-item">
-                <label>Сложность (<span id="difficulty-value">30</span>%)</label>
-                <input type="range" id="difficulty" min="10" max="50" step="5" value="30">
-            </div>
-            <div class="setting-item">
-                <label>Звук</label>
-                <input type="checkbox" id="sound-toggle" checked>
-            </div>
-            <button onclick="closeSettings()" class="close-btn">Закрыть</button>
-        </div>
-    </div>
-
-    <div id="toast" class="toast"></div>
-    <script src="script.js"></script>
+    <div class="container">
+        <div class="header">
+            <h1>Звуковой лабиринт</h1>
+            <div class="stats">
+                <p>Уровень: <span id="level">1</span></p>
+                <p>Счет: <span id="score">0</span></p>
+                <p>Рекорд: <span id="highscore">0</span></p>
+            </div>
+            <button id="settings-btn" class="settings-btn">⚙️</button>
+        </div>
+  
+        <div id="maze" class="maze"></div>
+  
+        <div class="controls">
+            <button onclick="movePlayer(0, -1)" class="control-btn">⬆️</button>
+            <button onclick="movePlayer(-1, 0)" class="control-btn">⬅️</button>
+            <button onclick="movePlayer(0, 1)" class="control-btn">⬇️</button>
+            <button onclick="movePlayer(1, 0)" class="control-btn">➡️</button>
+        </div>
+    </div>
+  
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h2>Настройки</h2>
+            <div class="setting-item">
+                <label>Сложность (<span id="difficulty-value">30</span>%)</label>
+                <input type="range" id="difficulty" min="10" max="50" step="5" value="30">
+            </div>
+            <div class="setting-item">
+                <label>Звук</label>
+                <input type="checkbox" id="sound-toggle" checked>
+            </div>
+            <button onclick="closeSettings()" class="close-btn">Закрыть</button>
+        </div>
+    </div>
+  
+    <div id="toast" class="toast"></div>
+    <script src="script.js"></script>
 </body>
 </html>
