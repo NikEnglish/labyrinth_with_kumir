@@ -1,12 +1,11 @@
 let maze = [];
 let playerPosition = { x: 0, y: 0 };
 let score = 0;
-let level = 1;
+let level = 1;  // Начальный уровень
 let difficulty = 30;
 let soundEnabled = true;
 let mazeSize = 8;
 let highScore = localStorage.getItem('mazehighscore') || 0;
-let finishEnabled = false; // Перемещение финиша включено или нет
 
 const sounds = {
     move: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'),
@@ -35,37 +34,34 @@ function generateMaze() {
         Array(mazeSize).fill(null).map((_, x) => createCell(x, y))
     );
 
-    // Создание пути от старта
+    // Create path from start to finish
     let currentX = 0;
     let currentY = 0;
+    const target = { x: mazeSize - 1, y: mazeSize - 1 };
+    
+    while (currentX !== target.x || currentY !== target.y) {
+        if (currentX < target.x && Math.random() > 0.5) {
+            currentX++;
+        } else if (currentY < target.y) {
+            currentY++;
+        } else {
+            currentX++;
+        }
+        maze[currentY][currentX].isPath = true;
+    }
 
-    // Добавление случайных стен
+    // Add random walls
     for (let y = 0; y < mazeSize; y++) {
         for (let x = 0; x < mazeSize; x++) {
-            if (Math.random() < difficulty / 100 && !(x === 0 && y === 0)) {
+            if (!maze[y][x].isPath && Math.random() < difficulty / 100) {
                 maze[y][x].isWall = true;
             }
         }
     }
 
-    // Начальная позиция игрока
     maze[0][0].isWall = false;
+    maze[mazeSize - 1][mazeSize - 1].isWall = false;
     playerPosition = { x: 0, y: 0 };
-
-    // Если финиш включен, перемещаем его в случайную позицию
-    if (finishEnabled) {
-        let targetX, targetY;
-        // Ищем место для финиша, которое не является стеной
-        do {
-            targetX = Math.floor(Math.random() * mazeSize);
-            targetY = Math.floor(Math.random() * mazeSize);
-        } while (maze[targetY][targetX].isWall || (targetX === 0 && targetY === 0)); // Исключаем стартовую точку
-
-        maze[targetY][targetX].isPath = true;
-    } else {
-        maze[mazeSize - 1][mazeSize - 1].isWall = false; // Иначе финиш остается в правом нижнем углу
-    }
-
     renderMaze();
 }
 
@@ -81,7 +77,7 @@ function renderMaze() {
             
             if (x === playerPosition.x && y === playerPosition.y) {
                 cell.classList.add('player');
-            } else if (maze[y][x].isPath && (finishEnabled || (x === mazeSize - 1 && y === mazeSize - 1))) {
+            } else if (x === mazeSize - 1 && y === mazeSize - 1) {
                 cell.classList.add('target');
             } else if (maze[y][x].isWall) {
                 cell.classList.add('wall');
@@ -154,7 +150,8 @@ const settingsModal = document.getElementById('settings-modal');
 const difficultySlider = document.getElementById('difficulty');
 const difficultyValue = document.getElementById('difficulty-value');
 const soundToggle = document.getElementById('sound-toggle');
-const finishToggle = document.getElementById('finish-toggle'); // Галочка для перемещения финиша
+const levelInput = document.getElementById('level-input');
+const applyLevelBtn = document.getElementById('apply-level-btn');
 
 settingsBtn.onclick = () => settingsModal.style.display = 'block';
 
@@ -165,16 +162,17 @@ function closeSettings() {
 difficultySlider.oninput = function() {
     difficulty = this.value;
     difficultyValue.textContent = difficulty;
-    generateMaze();
+    generateMaze();  // Генерация лабиринта с новым значением сложности
 };
 
 soundToggle.onchange = function() {
     soundEnabled = this.checked;
 };
 
-finishToggle.onchange = function() {
-    finishEnabled = this.checked;
-    generateMaze(); // Перегенерируем лабиринт при изменении состояния галочки
+applyLevelBtn.onclick = function() {
+    level = parseInt(levelInput.value, 10) || 1;  // Устанавливаем уровень, если введено корректное число
+    generateMaze();  // Генерация лабиринта с новым уровнем
+    closeSettings();
 };
 
 window.onclick = function(event) {
