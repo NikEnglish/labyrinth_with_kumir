@@ -6,6 +6,8 @@ let difficulty = 30;
 let soundEnabled = true;
 let mazeSize = 8;
 let highScore = localStorage.getItem('mazehighscore') || 0;
+let targetPosition = { x: 7, y: 7 }; // Начальная позиция финиша
+let isFinishMovable = false; // Флаг для перемещения финиша
 
 const sounds = {
     move: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'),
@@ -37,12 +39,12 @@ function generateMaze() {
     // Create path from start to finish
     let currentX = 0;
     let currentY = 0;
-    const target = { x: mazeSize - 1, y: mazeSize - 1 };
-    
-    while (currentX !== target.x || currentY !== target.y) {
-        if (currentX < target.x && Math.random() > 0.5) {
+    targetPosition = { x: mazeSize - 1, y: mazeSize - 1 };
+
+    while (currentX !== targetPosition.x || currentY !== targetPosition.y) {
+        if (currentX < targetPosition.x && Math.random() > 0.5) {
             currentX++;
-        } else if (currentY < target.y) {
+        } else if (currentY < targetPosition.y) {
             currentY++;
         } else {
             currentX++;
@@ -60,7 +62,7 @@ function generateMaze() {
     }
 
     maze[0][0].isWall = false;
-    maze[mazeSize - 1][mazeSize - 1].isWall = false;
+    maze[targetPosition.y][targetPosition.x].isWall = false;
     playerPosition = { x: 0, y: 0 };
     renderMaze();
 }
@@ -77,7 +79,7 @@ function renderMaze() {
             
             if (x === playerPosition.x && y === playerPosition.y) {
                 cell.classList.add('player');
-            } else if (x === mazeSize - 1 && y === mazeSize - 1) {
+            } else if (x === targetPosition.x && y === targetPosition.y) {
                 cell.classList.add('target');
             } else if (maze[y][x].isWall) {
                 cell.classList.add('wall');
@@ -116,7 +118,7 @@ function movePlayer(dx, dy) {
             playerPosition = newPosition;
             playSound('move');
             
-            if (newPosition.x === mazeSize - 1 && newPosition.y === mazeSize - 1) {
+            if (newPosition.x === targetPosition.x && newPosition.y === targetPosition.y) {
                 const levelScore = 100 * level;
                 score += levelScore;
                 if (score > highScore) {
@@ -150,6 +152,8 @@ const settingsModal = document.getElementById('settings-modal');
 const difficultySlider = document.getElementById('difficulty');
 const difficultyValue = document.getElementById('difficulty-value');
 const soundToggle = document.getElementById('sound-toggle');
+const finishToggle = document.getElementById('finish-toggle');
+const levelInput = document.getElementById('level');
 
 settingsBtn.onclick = () => settingsModal.style.display = 'block';
 
@@ -165,6 +169,18 @@ difficultySlider.oninput = function() {
 
 soundToggle.onchange = function() {
     soundEnabled = this.checked;
+};
+
+finishToggle.onchange = function() {
+    isFinishMovable = this.checked;
+    if (isFinishMovable) {
+        targetPosition = { x: Math.floor(Math.random() * mazeSize), y: Math.floor(Math.random() * mazeSize) };
+    }
+};
+
+levelInput.onchange = function() {
+    level = parseInt(this.value);
+    generateMaze();
 };
 
 window.onclick = function(event) {
