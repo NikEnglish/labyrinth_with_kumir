@@ -1,7 +1,7 @@
 let maze = [];
 let playerPosition = { x: 0, y: 0 };
 let score = 0;
-let level = 50;
+let level = 1;
 let difficulty = 30;
 let soundEnabled = true;
 let mazeSize = 8;
