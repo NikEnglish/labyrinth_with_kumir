@@ -7,8 +7,6 @@ let soundEnabled = true;
 let mazeSize = 8;
 let highScore = localStorage.getItem('mazehighscore') || 0;
 
-let finishEnabled = false; // Флаг для включения перемещения финиша
-
 const sounds = {
     move: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'),
     wall: new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3'),
@@ -36,18 +34,18 @@ function generateMaze() {
         Array(mazeSize).fill(null).map((_, x) => createCell(x, y))
     );
 
-    // Создаем путь от старта к финишу
+    // Create path from start to finish
     let currentX = 0;
     let currentY = 0;
     let targetX = mazeSize - 1;
     let targetY = mazeSize - 1;
 
+    // If finish movement is enabled, set a random finish position
     if (finishEnabled) {
-        // Перемещаем финиш на случайную позицию
         targetX = Math.floor(Math.random() * mazeSize);
         targetY = Math.floor(Math.random() * mazeSize);
     }
-
+    
     while (currentX !== targetX || currentY !== targetY) {
         if (currentX < targetX && Math.random() > 0.5) {
             currentX++;
@@ -59,7 +57,7 @@ function generateMaze() {
         maze[currentY][currentX].isPath = true;
     }
 
-    // Добавляем случайные стены
+    // Add random walls
     for (let y = 0; y < mazeSize; y++) {
         for (let x = 0; x < mazeSize; x++) {
             if (!maze[y][x].isPath && Math.random() < difficulty / 100) {
@@ -83,77 +81,116 @@ function renderMaze() {
         for (let x = 0; x < mazeSize; x++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
-
+            
             if (x === playerPosition.x && y === playerPosition.y) {
                 cell.classList.add('player');
-            } else if (x === mazeSize - 1 && y === mazeSize - 1 && finishEnabled) {
+            } else if (x === mazeSize - 1 && y === mazeSize - 1) {
                 cell.classList.add('target');
             } else if (maze[y][x].isWall) {
                 cell.classList.add('wall');
+            } else {
+                cell.classList.add('empty');
             }
-
+            
             mazeElement.appendChild(cell);
         }
     }
 }
 
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.backgroundColor = isError ? '#f44336' : '#333';
+    toast.style.display = 'block';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 2000);
+}
+
 function movePlayer(dx, dy) {
-    const newX = playerPosition.x + dx;
-    const newY = playerPosition.y + dy;
+    const newPosition = {
+        x: playerPosition.x + dx,
+        y: playerPosition.y + dy
+    };
 
-    if (newX >= 0 && newY >= 0 && newX < mazeSize && newY < mazeSize && !maze[newY][newX].isWall) {
-        playerPosition = { x: newX, y: newY };
-        playSound('move');
-        renderMaze();
-
-        // Проверка на финиш
-        if (playerPosition.x === mazeSize - 1 && playerPosition.y === mazeSize - 1) {
-            playSound('win');
-            setTimeout(() => {
-                alert('Вы выиграли!');
+    if (
+        newPosition.x >= 0 &&
+        newPosition.x < mazeSize &&
+        newPosition.y >= 0 &&
+        newPosition.y < mazeSize
+    ) {
+        if (!maze[newPosition.y][newPosition.x].isWall) {
+            playerPosition = newPosition;
+            playSound('move');
+            
+            if (newPosition.x === mazeSize - 1 && newPosition.y === mazeSize - 1) {
+                const levelScore = 100 * level;
+                score += levelScore;
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('mazehighscore', highScore);
+                }
+                playSound('win');
+                showToast(`Уровень пройден! +${levelScore} очков!`);
+                level++;
                 generateMaze();
-            }, 500);
+            } else {
+                renderMaze();
+            }
+            updateStats();
+        } else {
+            playSound('wall');
+            showToast('Упс! Там стена!', true);
         }
-    } else {
-        playSound('wall');
     }
 }
 
-document.addEventListener('keydown', (event) => {
-    switch (event.key) {
-        case 'ArrowUp':
-            movePlayer(0, -1);
-            break;
-        case 'ArrowDown':
-            movePlayer(0, 1);
-            break;
-        case 'ArrowLeft':
-            movePlayer(-1, 0);
-            break;
-        case 'ArrowRight':
-            movePlayer(1, 0);
-            break;
-    }
-});
-
-function openSettings() {
-    document.getElementById('settings-modal').style.display = 'flex';
+function updateStats() {
+    document.getElementById('level').textContent = level;
+    document.getElementById('score').textContent = score;
+    document.getElementById('highscore').textContent = highScore;
 }
 
-function closeSettings() {
-    document.getElementById('settings-modal').style.display = 'none';
-    level = parseInt(document.getElementById('level').value);
-    difficulty = parseInt(document.getElementById('difficulty').value);
-    finishEnabled = document.getElementById('finish-toggle').checked;
-    soundEnabled = document.getElementById('sound-toggle').checked;
-    generateMaze();
-}
+// Settings modal
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const difficultySlider = document.getElementById('difficulty');
+const difficultyValue = document.getElementById('difficulty-value');
+const soundToggle = document.getElementById('sound-toggle');
+const finishToggle = document.getElementById('finish-toggle');
+const levelInput = document.getElementById('level');
 
-document.getElementById('settings-btn').addEventListener('click', openSettings);
-document.getElementById('difficulty').addEventListener('input', (event) => {
-    document.getElementById('difficulty-value').innerText = event.target.value;
-});
+// For real-time settings updates
+let finishEnabled = false;
 
-window.onload = () => {
-    generateMaze();
+settingsBtn.onclick = () => settingsModal.style.display = 'block';
+
+finishToggle.onchange = function() {
+    finishEnabled = this.checked;
+    generateMaze(); // Re-generate maze immediately when finish setting changes
 };
+
+difficultySlider.oninput = function() {
+    difficulty = this.value;
+    difficultyValue.textContent = difficulty;
+    generateMaze(); // Re-generate maze immediately when difficulty changes
+};
+
+soundToggle.onchange = function() {
+    soundEnabled = this.checked;
+};
+
+levelInput.onchange = function() {
+    level = parseInt(this.value, 10);
+    generateMaze(); // Re-generate maze immediately when level changes
+};
+
+window.onclick = function(event) {
+    if (event.target === settingsModal) {
+        closeSettings();
+    }
+};
+
+// Initialize game
+generateMaze();
+updateStats();
