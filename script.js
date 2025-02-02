@@ -6,6 +6,7 @@ let difficulty = 30;
 let soundEnabled = true;
 let mazeSize = 8;
 let highScore = localStorage.getItem('mazehighscore') || 0;
+let finishEnabled = false; // Перемещение финиша включено или нет
 
 const sounds = {
     move: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'),
@@ -38,7 +39,7 @@ function generateMaze() {
     let currentX = 0;
     let currentY = 0;
     const target = { x: mazeSize - 1, y: mazeSize - 1 };
-    
+
     while (currentX !== target.x || currentY !== target.y) {
         if (currentX < target.x && Math.random() > 0.5) {
             currentX++;
@@ -60,7 +61,16 @@ function generateMaze() {
     }
 
     maze[0][0].isWall = false;
-    maze[mazeSize - 1][mazeSize - 1].isWall = false;
+
+    // Если финиш включен, перемещаем его в случайную позицию
+    if (finishEnabled) {
+        const targetX = Math.floor(Math.random() * mazeSize);
+        const targetY = Math.floor(Math.random() * mazeSize);
+        maze[targetY][targetX].isPath = true;
+    } else {
+        maze[mazeSize - 1][mazeSize - 1].isWall = false; // Иначе финиш остаётся в правом нижнем углу
+    }
+
     playerPosition = { x: 0, y: 0 };
     renderMaze();
 }
@@ -77,7 +87,7 @@ function renderMaze() {
             
             if (x === playerPosition.x && y === playerPosition.y) {
                 cell.classList.add('player');
-            } else if (x === mazeSize - 1 && y === mazeSize - 1) {
+            } else if (maze[y][x].isPath && (finishEnabled || (x === mazeSize - 1 && y === mazeSize - 1))) {
                 cell.classList.add('target');
             } else if (maze[y][x].isWall) {
                 cell.classList.add('wall');
@@ -150,6 +160,7 @@ const settingsModal = document.getElementById('settings-modal');
 const difficultySlider = document.getElementById('difficulty');
 const difficultyValue = document.getElementById('difficulty-value');
 const soundToggle = document.getElementById('sound-toggle');
+const finishToggle = document.getElementById('finish-toggle'); // Галочка для перемещения финиша
 
 settingsBtn.onclick = () => settingsModal.style.display = 'block';
 
@@ -165,6 +176,11 @@ difficultySlider.oninput = function() {
 
 soundToggle.onchange = function() {
     soundEnabled = this.checked;
+};
+
+finishToggle.onchange = function() {
+    finishEnabled = this.checked;
+    generateMaze(); // Перегенерируем лабиринт при изменении состояния галочки
 };
 
 window.onclick = function(event) {
