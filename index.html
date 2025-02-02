@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Звуковой лабиринт</title>
+    <title>Лабиринт с кумиром</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Звуковой лабиринт</h1>
+            <h1>Лабиринт с кумиром</h1>
             <div class="stats">
                 <p>Уровень: <span id="level">1</span></p>
                 <p>Счет: <span id="score">0</span></p>
@@ -23,8 +23,10 @@
         <div class="controls">
             <button onclick="movePlayer(0, -1)" class="control-btn">⬆️</button>
             <button onclick="movePlayer(-1, 0)" class="control-btn">⬅️</button>
-            <button onclick="movePlayer(0, 1)" class="control-btn">⬇️</button>
+            
             <button onclick="movePlayer(1, 0)" class="control-btn">➡️</button>
+            <button onclick="movePlayer(0, 1)" class="control-btn">⬇️</button>
+                  
         </div>
     </div>
   
@@ -44,7 +46,7 @@
                 <input type="checkbox" id="finish-toggle">
           </div>
            <div class="setting-item">
-                <label>Звук</label>
+                <label>Уровень:</label>
                 <input type="number" id="level" min="1" value="1">
            </div>
             <button onclick="closeSettings()" class="close-btn">Закрыть</button>
