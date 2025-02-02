@@ -37,19 +37,12 @@ function generateMaze() {
     // Create path from start to finish
     let currentX = 0;
     let currentY = 0;
-    let targetX = mazeSize - 1;
-    let targetY = mazeSize - 1;
-
-    // If finish movement is enabled, set a random finish position
-    if (finishEnabled) {
-        targetX = Math.floor(Math.random() * mazeSize);
-        targetY = Math.floor(Math.random() * mazeSize);
-    }
+    const target = { x: mazeSize - 1, y: mazeSize - 1 };
     
-    while (currentX !== targetX || currentY !== targetY) {
-        if (currentX < targetX && Math.random() > 0.5) {
+    while (currentX !== target.x || currentY !== target.y) {
+        if (currentX < target.x && Math.random() > 0.5) {
             currentX++;
-        } else if (currentY < targetY) {
+        } else if (currentY < target.y) {
             currentY++;
         } else {
             currentX++;
@@ -67,7 +60,7 @@ function generateMaze() {
     }
 
     maze[0][0].isWall = false;
-    maze[targetY][targetX].isWall = false;
+    maze[mazeSize - 1][mazeSize - 1].isWall = false;
     playerPosition = { x: 0, y: 0 };
     renderMaze();
 }
@@ -157,32 +150,21 @@ const settingsModal = document.getElementById('settings-modal');
 const difficultySlider = document.getElementById('difficulty');
 const difficultyValue = document.getElementById('difficulty-value');
 const soundToggle = document.getElementById('sound-toggle');
-const finishToggle = document.getElementById('finish-toggle');
-const levelInput = document.getElementById('level');
-
-// For real-time settings updates
-let finishEnabled = false;
 
 settingsBtn.onclick = () => settingsModal.style.display = 'block';
 
-finishToggle.onchange = function() {
-    finishEnabled = this.checked;
-    generateMaze(); // Re-generate maze immediately when finish setting changes
-};
+function closeSettings() {
+    settingsModal.style.display = 'none';
+}
 
 difficultySlider.oninput = function() {
     difficulty = this.value;
     difficultyValue.textContent = difficulty;
-    generateMaze(); // Re-generate maze immediately when difficulty changes
+    generateMaze();
 };
 
 soundToggle.onchange = function() {
     soundEnabled = this.checked;
-};
-
-levelInput.onchange = function() {
-    level = parseInt(this.value, 10);
-    generateMaze(); // Re-generate maze immediately when level changes
 };
 
 window.onclick = function(event) {
@@ -190,6 +172,24 @@ window.onclick = function(event) {
         closeSettings();
     }
 };
+
+// Keyboard controls
+document.addEventListener('keydown', (e) => {
+    switch(e.key) {
+        case 'ArrowUp':
+            movePlayer(0, -1);
+            break;
+        case 'ArrowDown':
+            movePlayer(0, 1);
+            break;
+        case 'ArrowLeft':
+            movePlayer(-1, 0);
+            break;
+        case 'ArrowRight':
+            movePlayer(1, 0);
+            break;
+    }
+});
 
 // Initialize game
 generateMaze();
