@@ -167,22 +167,22 @@ settingsBtn.onclick = () => settingsModal.style.display = 'block';
 
 finishToggle.onchange = function() {
     finishEnabled = this.checked;
-    generateMaze(); // Re-generate maze when finish setting changes
+    generateMaze(); // Re-generate maze immediately when finish setting changes
 };
 
 difficultySlider.oninput = function() {
     difficulty = this.value;
     difficultyValue.textContent = difficulty;
-    generateMaze(); // Re-generate maze when difficulty changes
+    generateMaze(); // Re-generate maze immediately when difficulty changes
 };
 
 soundToggle.onchange = function() {
     soundEnabled = this.checked;
 };
 
-levelInput.onchange = function() {
+levelInput.oninput = function() { // oninput instead of onchange for real-time updates
     level = parseInt(this.value, 10);
-    generateMaze(); // Re-generate maze when level changes
+    generateMaze(); // Re-generate maze immediately when level changes
 };
 
 window.onclick = function(event) {
@@ -190,24 +190,6 @@ window.onclick = function(event) {
         closeSettings();
     }
 };
-
-// Keyboard controls
-document.addEventListener('keydown', (e) => {
-    switch(e.key) {
-        case 'ArrowUp':
-            movePlayer(0, -1);
-            break;
-        case 'ArrowDown':
-            movePlayer(0, 1);
-            break;
-        case 'ArrowLeft':
-            movePlayer(-1, 0);
-            break;
-        case 'ArrowRight':
-            movePlayer(1, 0);
-            break;
-    }
-});
 
 // Initialize game
 generateMaze();
