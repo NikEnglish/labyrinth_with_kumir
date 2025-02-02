@@ -35,43 +35,37 @@ function generateMaze() {
         Array(mazeSize).fill(null).map((_, x) => createCell(x, y))
     );
 
-    // Create path from start to finish
+    // Создание пути от старта
     let currentX = 0;
     let currentY = 0;
-    const target = { x: mazeSize - 1, y: mazeSize - 1 };
 
-    while (currentX !== target.x || currentY !== target.y) {
-        if (currentX < target.x && Math.random() > 0.5) {
-            currentX++;
-        } else if (currentY < target.y) {
-            currentY++;
-        } else {
-            currentX++;
-        }
-        maze[currentY][currentX].isPath = true;
-    }
-
-    // Add random walls
+    // Добавление случайных стен
     for (let y = 0; y < mazeSize; y++) {
         for (let x = 0; x < mazeSize; x++) {
-            if (!maze[y][x].isPath && Math.random() < difficulty / 100) {
+            if (Math.random() < difficulty / 100 && !(x === 0 && y === 0)) {
                 maze[y][x].isWall = true;
             }
         }
     }
 
+    // Начальная позиция игрока
     maze[0][0].isWall = false;
+    playerPosition = { x: 0, y: 0 };
 
     // Если финиш включен, перемещаем его в случайную позицию
     if (finishEnabled) {
-        const targetX = Math.floor(Math.random() * mazeSize);
-        const targetY = Math.floor(Math.random() * mazeSize);
+        let targetX, targetY;
+        // Ищем место для финиша, которое не является стеной
+        do {
+            targetX = Math.floor(Math.random() * mazeSize);
+            targetY = Math.floor(Math.random() * mazeSize);
+        } while (maze[targetY][targetX].isWall || (targetX === 0 && targetY === 0)); // Исключаем стартовую точку
+
         maze[targetY][targetX].isPath = true;
     } else {
-        maze[mazeSize - 1][mazeSize - 1].isWall = false; // Иначе финиш остаётся в правом нижнем углу
+        maze[mazeSize - 1][mazeSize - 1].isWall = false; // Иначе финиш остается в правом нижнем углу
     }
 
-    playerPosition = { x: 0, y: 0 };
     renderMaze();
 }
 
