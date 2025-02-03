@@ -192,31 +192,10 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Kumir interpreter functions
-function RKN() {
-    const code = document.getElementById('kumir-input').value.toLowerCase(); // Приводим код к нижнему регистру
-
-    // Обработка циклов "нц раз" и "нц пока"
-    let matches;
-    let regex = /(нц раз (\d+) )(.+?)(кц|кон)/g;
-    while ((matches = regex.exec(code)) !== null) {
-        const times = parseInt(matches[2]);
-        const action = matches[3].trim();
-        for (let i = 0; i < times; i++) {
-            executeCommand(action);
-        }
-    }
-
-    regex = /(нц пока (.+?) )(.+?)(кц|кон)/g;
-    while ((matches = regex.exec(code)) !== null) {
-        const condition = matches[2].trim();
-        const action = matches[3].trim();
-        while (evalCondition(condition)) {
-            executeCommand(action);
-        }
-    }
-}
-
+// Обработчик всех команд
 function executeCommand(command) {
+    command = command.trim().toLowerCase(); // Приводим команду к нижнему регистру и убираем лишние пробелы
+
     switch (command) {
         case 'вправо':
             movePlayer(1, 0);
@@ -240,28 +219,101 @@ function executeCommand(command) {
     }
 }
 
+// Функция для обработки команд циклов "нц раз" и "нц пока"
+function RKN(code) {
+    const normalizedCode = code.toLowerCase(); // Приводим код к нижнему регистру
+
+    // Обрабатываем цикл "нц раз X"
+    const regex = /(нц раз (\d+) )(.*?)(кц|кон)/gs;
+    let matches;
+    while ((matches = regex.exec(normalizedCode)) !== null) {
+        const times = parseInt(matches[2], 10);
+        const action = matches[3].trim();
+
+        for (let i = 0; i < times; i++) {
+            executeCommand(action);
+        }
+    }
+
+    // Обрабатываем цикл "нц пока"
+    const whileRegex = /(нц пока (.*?))(.*?)(кц|кон)/gs;
+    while ((matches = whileRegex.exec(normalizedCode)) !== null) {
+        const condition = matches[2].trim();
+        const action = matches[3].trim();
+
+        while (evalCondition(condition)) {
+            executeCommand(action);
+        }
+    }
+}
+
+// Функция для оценки условия
 function evalCondition(condition) {
+    condition = condition.trim().toLowerCase(); // Приводим к нижнему регистру
+
     switch (condition) {
-        case 'слева свободно':
-            return playerPosition.x > 0 && !maze[playerPosition.y][playerPosition.x - 1].isWall;
         case 'справа свободно':
             return playerPosition.x < mazeSize - 1 && !maze[playerPosition.y][playerPosition.x + 1].isWall;
-        case 'сверху свободно':
+        case 'слева свободно':
+            return playerPosition.x > 0 && !maze[playerPosition.y][playerPosition.x - 1].isWall;
+        case 'вверх свободно':
             return playerPosition.y > 0 && !maze[playerPosition.y - 1][playerPosition.x].isWall;
-        case 'снизу свободно':
+        case 'вниз свободно':
             return playerPosition.y < mazeSize - 1 && !maze[playerPosition.y + 1][playerPosition.x].isWall;
-        case 'слева не свободно':
-            return playerPosition.x > 0 && maze[playerPosition.y][playerPosition.x - 1].isWall;
         case 'справа не свободно':
             return playerPosition.x < mazeSize - 1 && maze[playerPosition.y][playerPosition.x + 1].isWall;
-        case 'сверху не свободно':
+        case 'слева не свободно':
+            return playerPosition.x > 0 && maze[playerPosition.y][playerPosition.x - 1].isWall;
+        case 'вверх не свободно':
             return playerPosition.y > 0 && maze[playerPosition.y - 1][playerPosition.x].isWall;
-        case 'снизу не свободно':
+        case 'вниз не свободно':
             return playerPosition.y < mazeSize - 1 && maze[playerPosition.y + 1][playerPosition.x].isWall;
         default:
             return false;
     }
 }
+
+// Инициализация игры и начальная настройка
+function initializeGame() {
+    generateMaze();
+    updateStats();
+}
+
+// Функции для движения игрока
+function movePlayer(dx, dy) {
+    const newPosition = {
+        x: playerPosition.x + dx,
+        y: playerPosition.y + dy
+    };
+
+    if (
+        newPosition.x >= 0 &&
+        newPosition.x < mazeSize &&
+        newPosition.y >= 0 &&
+        newPosition.y < mazeSize
+    ) {
+        if (!maze[newPosition.y][newPosition.x].isWall) {
+            playerPosition = newPosition;
+            renderMaze();
+        } else {
+            playSound('wall');
+            showToast('Упс! Там стена!', true);
+        }
+    }
+}
+
+// Показать информацию
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.backgroundColor = isError ? '#f44336' : '#333';
+    toast.style.display = 'block';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 2000);
+}
+
+// Инициализация игры
 
 // Initialize game
 generateMaze();
