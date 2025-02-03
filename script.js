@@ -193,47 +193,74 @@ document.addEventListener('keydown', (e) => {
 
 // Kumir interpreter functions
 function RKN() {
-    const code = document.getElementById('kumir-input').value;
+    const code = document.getElementById('kumir-input').value.toLowerCase(); // Приводим код к нижнему регистру
 
-    const lines = code.split("\n").map(line => line.trim());
-    let currentLine = 0;
-
-    function executeNextLine() {
-        if (currentLine >= lines.length) return;
-
-        const line = lines[currentLine++];
-        console.log(line);
-        switch(line) {
-            case 'Вправо':
-                movePlayer(1, 0);
-                break;
-            case 'Влево':
-                movePlayer(-1, 0);
-                break;
-            case 'Вниз':
-                movePlayer(0, 1);
-                break;
-            case 'Закрасить':
-                maze[playerPosition.y][playerPosition.x].isWall = true;
-                renderMaze();
-                break;
-            case 'Нц пока слева свободно':
-                while (maze[playerPosition.y][playerPosition.x - 1]?.isWall === false) {
-                    movePlayer(-1, 0);
-                }
-                break;
-            case 'Нц пока слева не свободно':
-                while (maze[playerPosition.y][playerPosition.x - 1]?.isWall !== true) {
-                    movePlayer(0, 1);
-                }
-                break;
-            default:
-                console.log(`Неизвестная команда: ${line}`);
+    // Обработка циклов "нц раз" и "нц пока"
+    let matches;
+    let regex = /(нц раз (\d+) )(.+?)(кц|кон)/g;
+    while ((matches = regex.exec(code)) !== null) {
+        const times = parseInt(matches[2]);
+        const action = matches[3].trim();
+        for (let i = 0; i < times; i++) {
+            executeCommand(action);
         }
-        setTimeout(executeNextLine, 500);
     }
 
-    executeNextLine();
+    regex = /(нц пока (.+?) )(.+?)(кц|кон)/g;
+    while ((matches = regex.exec(code)) !== null) {
+        const condition = matches[2].trim();
+        const action = matches[3].trim();
+        while (evalCondition(condition)) {
+            executeCommand(action);
+        }
+    }
+}
+
+function executeCommand(command) {
+    switch (command) {
+        case 'вправо':
+            movePlayer(1, 0);
+            break;
+        case 'влево':
+            movePlayer(-1, 0);
+            break;
+        case 'вверх':
+            movePlayer(0, -1);
+            break;
+        case 'вниз':
+            movePlayer(0, 1);
+            break;
+        case 'закрасить':
+            maze[playerPosition.y][playerPosition.x].isVisited = true;
+            renderMaze();
+            break;
+        default:
+            console.log('Неизвестная команда:', command);
+            break;
+    }
+}
+
+function evalCondition(condition) {
+    switch (condition) {
+        case 'слева свободно':
+            return playerPosition.x > 0 && !maze[playerPosition.y][playerPosition.x - 1].isWall;
+        case 'справа свободно':
+            return playerPosition.x < mazeSize - 1 && !maze[playerPosition.y][playerPosition.x + 1].isWall;
+        case 'сверху свободно':
+            return playerPosition.y > 0 && !maze[playerPosition.y - 1][playerPosition.x].isWall;
+        case 'снизу свободно':
+            return playerPosition.y < mazeSize - 1 && !maze[playerPosition.y + 1][playerPosition.x].isWall;
+        case 'слева не свободно':
+            return playerPosition.x > 0 && maze[playerPosition.y][playerPosition.x - 1].isWall;
+        case 'справа не свободно':
+            return playerPosition.x < mazeSize - 1 && maze[playerPosition.y][playerPosition.x + 1].isWall;
+        case 'сверху не свободно':
+            return playerPosition.y > 0 && maze[playerPosition.y - 1][playerPosition.x].isWall;
+        case 'снизу не свободно':
+            return playerPosition.y < mazeSize - 1 && maze[playerPosition.y + 1][playerPosition.x].isWall;
+        default:
+            return false;
+    }
 }
 
 // Initialize game
