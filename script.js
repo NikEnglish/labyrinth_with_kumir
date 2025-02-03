@@ -195,14 +195,45 @@ document.addEventListener('keydown', (e) => {
 function RKN() {
     const code = document.getElementById('kumir-input').value;
 
-    try {
-        // Проверка синтаксиса и выполнение кода
-        console.log("Running Kumir Code:", code);
-        // Здесь будет код для выполнения Кумир-кода
-    } catch (error) {
-        console.error('Error executing Kumir code:', error);
-        showToast('Ошибка при выполнении кода.', true);
+    const lines = code.split("\n").map(line => line.trim());
+    let currentLine = 0;
+
+    function executeNextLine() {
+        if (currentLine >= lines.length) return;
+
+        const line = lines[currentLine++];
+        console.log(line);
+        switch(line) {
+            case 'Вправо':
+                movePlayer(1, 0);
+                break;
+            case 'Влево':
+                movePlayer(-1, 0);
+                break;
+            case 'Вниз':
+                movePlayer(0, 1);
+                break;
+            case 'Закрасить':
+                maze[playerPosition.y][playerPosition.x].isWall = true;
+                renderMaze();
+                break;
+            case 'Нц пока слева свободно':
+                while (maze[playerPosition.y][playerPosition.x - 1]?.isWall === false) {
+                    movePlayer(-1, 0);
+                }
+                break;
+            case 'Нц пока слева не свободно':
+                while (maze[playerPosition.y][playerPosition.x - 1]?.isWall !== true) {
+                    movePlayer(0, 1);
+                }
+                break;
+            default:
+                console.log(`Неизвестная команда: ${line}`);
+        }
+        setTimeout(executeNextLine, 500);
     }
+
+    executeNextLine();
 }
 
 // Initialize game
