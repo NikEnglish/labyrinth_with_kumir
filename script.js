@@ -220,7 +220,8 @@ function executeCommand(command) {
 }
 
 // Функция для обработки команд циклов "нц раз" и "нц пока"
-function RKN(code) {
+function RKN() {
+    const code = document.getElementById('kumir-input').value.toLowerCase(); // Приводим код к нижнему регистру
     const normalizedCode = code.toLowerCase(); // Приводим код к нижнему регистру
 
     // Обрабатываем цикл "нц раз X"
