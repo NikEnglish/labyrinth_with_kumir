@@ -1,4 +1,3 @@
-updateStats();
 let maze = [];
 let playerPosition = { x: 0, y: 0 };
 let score = 0;
@@ -193,45 +192,30 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Кумир интерпретатор
-const kumirCodeArea = document.getElementById('kumir-code');
-const kumirOutput = document.getElementById('kumir-output');
-const runKumirCodeButton = document.getElementById('run-kumir-code');
 
-runKumirCodeButton.onclick = function() {
+function runkumirCode() {
     try {
-        const code = kumirCodeArea.value.trim();
-        if (code) {
-            const result = interpretKumir(code);
-            kumirOutput.textContent = result;
-        }
+        const code = document.getElementById('kumir-code').value;
+        executeKumirCode(code);
     } catch (error) {
-        kumirOutput.textContent = `Ошибка: ${error.message}`;
+        console.error("Ошибка выполнения кода Кумир:", error);
+        showToast("Ошибка в коде Кумир", true);
     }
-};
-
-// Интерпретатор Кумир
-function interpretKumir(code) {
-    const commands = code.split('\n');
-    let output = '';
-    let robotPosition = { x: 0, y: 0 };
-
-    commands.forEach(command => {
-        if (command === 'вправо') {
-            robotPosition.x++;
-        } else if (command === 'влево') {
-            robotPosition.x--;
-        } else if (command === 'вверх') {
-            robotPosition.y--;
-        } else if (command === 'вниз') {
-            robotPosition.y++;
-        } else {
-            throw new Error('Неверная команда');
-        }
-    });
-
-    output = `Робот переместился в позицию: (${robotPosition.x}, ${robotPosition.y})`;
-    return output;
 }
+
+function executeKumirCode(code) {
+    // Здесь эмулируется выполнение кода Кумир
+    console.log("Выполняем код Кумир:", code);
+
+    // Пример для проверки синтаксиса
+    if (code.includes('нц раз 10')) {
+        console.log("Успешно выполнено!");
+    } else {
+        throw new Error("Некорректный синтаксис");
+    }
+}
+
+document.getElementById('run-button').onclick = runkumirCode;
 
 // Initialize game
 generateMaze();
