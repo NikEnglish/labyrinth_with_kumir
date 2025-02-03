@@ -192,7 +192,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Kumir interpreter functions
-function runKumirCode() {
+function RKN() {
     const code = document.getElementById('kumir-input').value;
 
     try {
