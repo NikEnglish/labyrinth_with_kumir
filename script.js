@@ -144,53 +144,6 @@ function updateStats() {
     document.getElementById('highscore').textContent = highScore;
 }
 
-// Settings modal
-const settingsBtn = document.getElementById('settings-btn');
-const settingsModal = document.getElementById('settings-modal');
-const difficultySlider = document.getElementById('difficulty');
-const difficultyValue = document.getElementById('difficulty-value');
-const soundToggle = document.getElementById('sound-toggle');
-
-settingsBtn.onclick = () => settingsModal.style.display = 'block';
-
-function closeSettings() {
-    settingsModal.style.display = 'none';
-}
-
-difficultySlider.oninput = function() {
-    difficulty = this.value;
-    difficultyValue.textContent = difficulty;
-    generateMaze();
-};
-
-soundToggle.onchange = function() {
-    soundEnabled = this.checked;
-};
-
-window.onclick = function(event) {
-    if (event.target === settingsModal) {
-        closeSettings();
-    }
-};
-
-// Keyboard controls
-document.addEventListener('keydown', (e) => {
-    switch(e.key) {
-        case 'ArrowUp':
-            movePlayer(0, -1);
-            break;
-        case 'ArrowDown':
-            movePlayer(0, 1);
-            break;
-        case 'ArrowLeft':
-            movePlayer(-1, 0);
-            break;
-        case 'ArrowRight':
-            movePlayer(1, 0);
-            break;
-    }
-});
-
 // Kumir interpreter functions
 function RKN() {
     const code = document.getElementById('kumir-input').value.toLowerCase(); // Приводим код к нижнему регистру
