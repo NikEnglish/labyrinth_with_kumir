@@ -191,18 +191,45 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Kumir interpreter functions
-function runKumirCode() {
-    const code = document.getElementById('kumir-input').value;
+// Кумир интерпретатор
+const kumirCodeArea = document.getElementById('kumir-code');
+const kumirOutput = document.getElementById('kumir-output');
+const runKumirCodeButton = document.getElementById('run-kumir-code');
 
+runKumirCodeButton.onclick = function() {
     try {
-        // Проверка синтаксиса и выполнение кода
-        console.log("Running Kumir Code:", code);
-        // Здесь будет код для выполнения Кумир-кода
+        const code = kumirCodeArea.value.trim();
+        if (code) {
+            const result = interpretKumir(code);
+            kumirOutput.textContent = result;
+        }
     } catch (error) {
-        console.error('Error executing Kumir code:', error);
-        showToast('Ошибка при выполнении кода.', true);
+        kumirOutput.textContent = `Ошибка: ${error.message}`;
     }
+};
+
+// Интерпретатор Кумир
+function interpretKumir(code) {
+    const commands = code.split('\n');
+    let output = '';
+    let robotPosition = { x: 0, y: 0 };
+
+    commands.forEach(command => {
+        if (command === 'вправо') {
+            robotPosition.x++;
+        } else if (command === 'влево') {
+            robotPosition.x--;
+        } else if (command === 'вверх') {
+            robotPosition.y--;
+        } else if (command === 'вниз') {
+            robotPosition.y++;
+        } else {
+            throw new Error('Неверная команда');
+        }
+    });
+
+    output = `Робот переместился в позицию: (${robotPosition.x}, ${robotPosition.y})`;
+    return output;
 }
 
 // Initialize game
