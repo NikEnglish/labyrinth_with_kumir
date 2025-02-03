@@ -191,31 +191,19 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Кумир интерпретатор
+// Kumir interpreter functions
+function runKumirCode() {
+    const code = document.getElementById('kumir-input').value;
 
-function runkumirCode() {
     try {
-        const code = document.getElementById('kumir-code').value;
-        executeKumirCode(code);
+        // Проверка синтаксиса и выполнение кода
+        console.log("Running Kumir Code:", code);
+        // Здесь будет код для выполнения Кумир-кода
     } catch (error) {
-        console.error("Ошибка выполнения кода Кумир:", error);
-        showToast("Ошибка в коде Кумир", true);
+        console.error('Error executing Kumir code:', error);
+        showToast('Ошибка при выполнении кода.', true);
     }
 }
-
-function executeKumirCode(code) {
-    // Здесь эмулируется выполнение кода Кумир
-    console.log("Выполняем код Кумир:", code);
-
-    // Пример для проверки синтаксиса
-    if (code.includes('нц раз 10')) {
-        console.log("Успешно выполнено!");
-    } else {
-        throw new Error("Некорректный синтаксис");
-    }
-}
-
-document.getElementById('run-button').onclick = runkumirCode;
 
 // Initialize game
 generateMaze();
