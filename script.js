@@ -1,7 +1,8 @@
+updateStats();
 let maze = [];
 let playerPosition = { x: 0, y: 0 };
 let score = 0;
-let level = 1;  // Начальный уровень
+let level = 1;
 let difficulty = 30;
 let soundEnabled = true;
 let mazeSize = 8;
@@ -150,8 +151,6 @@ const settingsModal = document.getElementById('settings-modal');
 const difficultySlider = document.getElementById('difficulty');
 const difficultyValue = document.getElementById('difficulty-value');
 const soundToggle = document.getElementById('sound-toggle');
-const levelInput = document.getElementById('level-input');
-const applyLevelBtn = document.getElementById('apply-level-btn');
 
 settingsBtn.onclick = () => settingsModal.style.display = 'block';
 
@@ -162,17 +161,11 @@ function closeSettings() {
 difficultySlider.oninput = function() {
     difficulty = this.value;
     difficultyValue.textContent = difficulty;
-    generateMaze();  // Генерация лабиринта с новым значением сложности
+    generateMaze();
 };
 
 soundToggle.onchange = function() {
     soundEnabled = this.checked;
-};
-
-applyLevelBtn.onclick = function() {
-    level = parseInt(levelInput.value, 10) || 1;  // Устанавливаем уровень, если введено корректное число
-    generateMaze();  // Генерация лабиринта с новым уровнем
-    closeSettings();
 };
 
 window.onclick = function(event) {
@@ -198,6 +191,47 @@ document.addEventListener('keydown', (e) => {
             break;
     }
 });
+
+// Кумир интерпретатор
+const kumirCodeArea = document.getElementById('kumir-code');
+const kumirOutput = document.getElementById('kumir-output');
+const runKumirCodeButton = document.getElementById('run-kumir-code');
+
+runKumirCodeButton.onclick = function() {
+    try {
+        const code = kumirCodeArea.value.trim();
+        if (code) {
+            const result = interpretKumir(code);
+            kumirOutput.textContent = result;
+        }
+    } catch (error) {
+        kumirOutput.textContent = `Ошибка: ${error.message}`;
+    }
+};
+
+// Интерпретатор Кумир
+function interpretKumir(code) {
+    const commands = code.split('\n');
+    let output = '';
+    let robotPosition = { x: 0, y: 0 };
+
+    commands.forEach(command => {
+        if (command === 'вправо') {
+            robotPosition.x++;
+        } else if (command === 'влево') {
+            robotPosition.x--;
+        } else if (command === 'вверх') {
+            robotPosition.y--;
+        } else if (command === 'вниз') {
+            robotPosition.y++;
+        } else {
+            throw new Error('Неверная команда');
+        }
+    });
+
+    output = `Робот переместился в позицию: (${robotPosition.x}, ${robotPosition.y})`;
+    return output;
+}
 
 // Initialize game
 generateMaze();
