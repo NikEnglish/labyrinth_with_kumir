@@ -1,7 +1,7 @@
 let maze = [];
 let playerPosition = { x: 0, y: 0 };
 let score = 0;
-let level = 1;
+let level = 1;  // Начальный уровень
 let difficulty = 30;
 let soundEnabled = true;
 let mazeSize = 8;
@@ -144,77 +144,60 @@ function updateStats() {
     document.getElementById('highscore').textContent = highScore;
 }
 
-// Kumir interpreter functions
-function RKN() {
-    const code = document.getElementById('kumir-input').value.toLowerCase(); // Приводим код к нижнему регистру
+// Settings modal
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const difficultySlider = document.getElementById('difficulty');
+const difficultyValue = document.getElementById('difficulty-value');
+const soundToggle = document.getElementById('sound-toggle');
+const levelInput = document.getElementById('level-input');
+const applyLevelBtn = document.getElementById('apply-level-btn');
 
-    // Обработка циклов "нц раз" и "нц пока"
-    let matches;
-    let regex = /(нц раз (\d+) )(.+?)(кц|кон)/g;
-    while ((matches = regex.exec(code)) !== null) {
-        const times = parseInt(matches[2]);
-        const action = matches[3].trim();
-        for (let i = 0; i < times; i++) {
-            executeCommand(action);
-        }
-    }
+settingsBtn.onclick = () => settingsModal.style.display = 'block';
 
-    regex = /(нц пока (.+?) )(.+?)(кц|кон)/g;
-    while ((matches = regex.exec(code)) !== null) {
-        const condition = matches[2].trim();
-        const action = matches[3].trim();
-        while (evalCondition(condition)) {
-            executeCommand(action);
-        }
-    }
+function closeSettings() {
+    settingsModal.style.display = 'none';
 }
 
-function executeCommand(command) {
-    switch (command) {
-        case 'вправо':
-            movePlayer(1, 0);
-            break;
-        case 'влево':
-            movePlayer(-1, 0);
-            break;
-        case 'вверх':
+difficultySlider.oninput = function() {
+    difficulty = this.value;
+    difficultyValue.textContent = difficulty;
+    generateMaze();  // Генерация лабиринта с новым значением сложности
+};
+
+soundToggle.onchange = function() {
+    soundEnabled = this.checked;
+};
+
+applyLevelBtn.onclick = function() {
+    level = parseInt(levelInput.value, 10) || 1;  // Устанавливаем уровень, если введено корректное число
+    generateMaze();  // Генерация лабиринта с новым уровнем
+    closeSettings();
+};
+
+window.onclick = function(event) {
+    if (event.target === settingsModal) {
+        closeSettings();
+    }
+};
+
+// Keyboard controls
+document.addEventListener('keydown', (e) => {
+    switch(e.key) {
+        case 'ArrowUp':
             movePlayer(0, -1);
             break;
-        case 'вниз':
+        case 'ArrowDown':
             movePlayer(0, 1);
             break;
-        case 'закрасить':
-            maze[playerPosition.y][playerPosition.x].isVisited = true;
-            renderMaze();
+        case 'ArrowLeft':
+            movePlayer(-1, 0);
             break;
-        default:
-            console.log('Неизвестная команда:', command);
+        case 'ArrowRight':
+            movePlayer(1, 0);
             break;
     }
-}
-
-function evalCondition(condition) {
-    switch (condition) {
-        case 'слева свободно':
-            return playerPosition.x > 0 && !maze[playerPosition.y][playerPosition.x - 1].isWall;
-        case 'справа свободно':
-            return playerPosition.x < mazeSize - 1 && !maze[playerPosition.y][playerPosition.x + 1].isWall;
-        case 'вверх свободно':
-            return playerPosition.y > 0 && !maze[playerPosition.y - 1][playerPosition.x].isWall;
-        case 'вниз свободно':
-            return playerPosition.y < mazeSize - 1 && !maze[playerPosition.y + 1][playerPosition.x].isWall;
-        case 'слева не свободно':
-            return playerPosition.x > 0 && maze[playerPosition.y][playerPosition.x - 1].isWall;
-        case 'справа не свободно':
-            return playerPosition.x < mazeSize - 1 && maze[playerPosition.y][playerPosition.x + 1].isWall;
-        case 'вверх не свободно':
-            return playerPosition.y > 0 && maze[playerPosition.y - 1][playerPosition.x].isWall;
-        case 'вниз не свободно':
-            return playerPosition.y < mazeSize - 1 && maze[playerPosition.y + 1][playerPosition.x].isWall;
-        default:
-            return false;
-    }
-}
+});
 
 // Initialize game
 generateMaze();
